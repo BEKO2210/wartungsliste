@@ -1,5 +1,5 @@
 /* Minimal offline cache for GitHub Pages (relative scope). */
-const CACHE = "wartungsliste-v1";
+const CACHE = "wartungsliste-v2";
 const ASSETS = [
   "./",
   "./index.html",
