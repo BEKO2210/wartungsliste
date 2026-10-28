@@ -1,0 +1,444 @@
+/* Custom Scrollbar for Editor */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+
+    /* DIN A4 Page Styling (Exact Print & Preview Specs) */
+    :root {
+      --row-pad-y: 4px;
+      --row-min-h: 26px;
+      --base-font-size: 8.5pt;
+      --check-size: 12.5pt;
+      --sec-gap: 9px;
+    }
+
+    .a4-page {
+      width: 210mm;
+      height: 297mm;
+      background-color: #ffffff;
+      color: #2c3e50;
+      font-family: Arial, Helvetica, sans-serif;
+      padding: 11mm 13mm 10mm 13mm;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      transform-origin: top center;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .a4-content {
+      flex: 1 1 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sec-gap);
+      overflow: hidden;
+    }
+
+    /* Header Banner */
+    .pdf-header-banner {
+      background-color: #2c3e50 !important;
+      color: #ffffff !important;
+      border-radius: 4px;
+      padding: 9px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .pdf-header-title h1 {
+      margin: 0;
+      font-size: 14.5pt;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      line-height: 1.15;
+      color: #ffffff !important;
+    }
+    .pdf-header-title p {
+      margin: 2px 0 0 0;
+      font-size: 8.5pt;
+      color: #cbd5e1 !important;
+      font-weight: 400;
+    }
+    .pdf-header-infobox {
+      background-color: #34495e !important;
+      border-radius: 4px;
+      padding: 6px 11px;
+      font-size: 8.5pt;
+      line-height: 1.45;
+      color: #ffffff !important;
+      min-width: 235px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      flex-shrink: 0;
+    }
+    .pdf-info-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .pdf-info-row + .pdf-info-row {
+      margin-top: 3px;
+    }
+    .pdf-info-label {
+      font-weight: 700;
+      color: #cbd5e1 !important;
+      flex-shrink: 0;
+    }
+    .pdf-info-val {
+      font-weight: 700;
+      color: #ffffff !important;
+      text-align: right;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pdf-info-line {
+      display: inline-block;
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+      min-width: 105px;
+      height: 11px;
+      margin-left: 4px;
+    }
+
+    /* Section Header */
+    .pdf-section-block {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .pdf-section-header {
+      background-color: #34495e !important;
+      color: #ffffff !important;
+      font-size: 9pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 4px 9px;
+      border-left: 5px solid #3498db !important;
+      border-radius: 2px 2px 0 0;
+      margin: 0;
+    }
+
+    /* Tables */
+    .pdf-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: var(--base-font-size);
+    }
+    .pdf-table th {
+      background-color: #ecf0f1 !important;
+      color: #2c3e50 !important;
+      font-weight: 700;
+      font-size: 7.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      padding: 4px 6px;
+      border: 1px solid #dcdde1;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pdf-table th.col-center,
+    .pdf-table td.col-center {
+      text-align: center;
+    }
+    .pdf-table td {
+      padding: var(--row-pad-y) 7px;
+      border: 1px solid #dcdde1;
+      vertical-align: middle;
+      line-height: 1.28;
+      height: var(--row-min-h);
+      word-wrap: break-word;
+    }
+    .pdf-table tbody tr:nth-child(odd) td {
+      background-color: #ffffff !important;
+    }
+    .pdf-table tbody tr:nth-child(even) td {
+      background-color: #f8f9fa !important;
+    }
+    .pdf-col-1 {
+      width: 22%;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+    .pdf-col-2 {
+      width: 68%;
+      color: #2c3e50;
+    }
+    .pdf-col-3 {
+      width: 10%;
+      text-align: center;
+      vertical-align: middle;
+      padding-left: 2px !important;
+      padding-right: 2px !important;
+    }
+
+    /* Interactive Checkbox in Preview */
+    .pdf-checkbox-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      font-size: var(--check-size);
+      line-height: 1;
+      color: #2c3e50;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 2px;
+      transition: transform 0.1s ease, color 0.1s ease;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font-family: inherit;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .pdf-checkbox-btn:hover {
+      transform: scale(1.15);
+      color: #2980b9;
+    }
+    .pdf-checkbox-btn.checked {
+      color: #16a34a !important;
+      font-weight: bold;
+    }
+
+    /* Bullet list formatting inside Col 2 */
+    .pdf-task-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .pdf-task-list li {
+      position: relative;
+      padding-left: 9px;
+      margin-bottom: 1px;
+    }
+    .pdf-task-list li:last-child {
+      margin-bottom: 0;
+    }
+    .pdf-task-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #34495e;
+      font-weight: bold;
+    }
+
+    /* Red Warning Box */
+    .pdf-warning-box {
+      background-color: #fdf0ed !important;
+      border-left: 3px solid #e74c3c !important;
+      padding: 3px 7px;
+      margin-top: 3px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      color: #c0392b !important;
+      border-radius: 2px;
+      display: block;
+      width: 100%;
+    }
+
+    /* Signatures & Footer */
+    .pdf-signatures {
+      margin-top: auto;
+      padding-top: 4px;
+      flex-shrink: 0;
+    }
+    .pdf-sig-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 32px;
+    }
+    .pdf-sig-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .pdf-sig-name {
+      min-height: 20px;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 2px;
+      font-size: 9pt;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    .pdf-sig-line {
+      border-bottom: 1.5px solid #2c3e50;
+      margin-bottom: 4px;
+    }
+    .pdf-sig-label {
+      font-size: 7.5pt;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .pdf-footer {
+      flex-shrink: 0;
+      margin-top: 6px;
+      padding-top: 4px;
+      border-top: 1px solid #dcdde1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 7pt;
+      color: #7f8c8d !important;
+    }
+
+    /* Page Overflow Warning Indicator in Preview */
+    .a4-page.is-overflowing {
+      outline: 3px solid #ef4444;
+    }
+
+    /* PRINT MEDIA RULES - ONLY PRINT THE A4 PAGE EXACTLY */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      html, body {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      #preview-wrapper {
+        width: 210mm !important;
+        height: 297mm !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        overflow: visible !important;
+        background: none !important;
+      }
+      #a4-scale-container {
+        transform: none !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+      }
+      .a4-page {
+        box-shadow: none !important;
+        outline: none !important;
+        border: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+      .pdf-checkbox-btn.checked {
+        color: #2c3e50 !important;
+      }
+    }
+
+
+/* --- Accessibility: visible focus without changing idle look --- */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+.pdf-checkbox-btn:focus-visible {
+  outline: 2px solid #2980b9;
+  outline-offset: 1px;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 0 0 0.5rem 0;
+}
+.skip-link:focus {
+  left: 0;
+}
+
+/* Toast / status messages for import errors */
+#app-toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 50;
+  max-width: 22rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  display: none;
+}
+#app-toast.is-visible { display: block; }
+#app-toast.is-error { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+#app-toast.is-ok { background: #064e3b; color: #a7f3d0; border: 1px solid #10b981; }
+
+/* Mobile layout tweaks (desktop unchanged at lg+) */
+@media (max-width: 1023px) {
+  body.h-screen {
+    height: 100dvh;
+  }
+  aside.no-print {
+    min-height: 0;
+  }
+}
+
+/* Print edge-cases */
+@media print {
+  .pdf-section-block,
+  .pdf-table tr,
+  .pdf-signatures,
+  .pdf-header-banner {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .pdf-table thead {
+    display: table-header-group;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
