@@ -57,7 +57,10 @@ function assert(cond, msg) {
 
 async function main() {
   const { server, base } = await startServer();
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: true,
+    ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
+  });
   const errors = [];
   const page = await browser.newPage();
   page.on("console", (msg) => {
@@ -137,6 +140,80 @@ async function main() {
     name: "Import-Validierung (Fehlertoast)",
     ok: /fehlgeschlagen|ungültig|Import/i.test(toast),
     detail: toast.slice(0, 120),
+  });
+
+  // 5) Logo: Upload, Anzeige im Kopfbereich, Persistenz
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="40"><rect width="120" height="40" fill="#e11d48"/></svg>';
+  await page.evaluate(async (svgText) => {
+    const file = new File([svgText], "logo.svg", { type: "image/svg+xml" });
+    await handleLogoFile(file);
+  }, svg);
+  await page.waitForTimeout(300);
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(300);
+  const logoInfo = await page.evaluate(() => {
+    const wrap = document.getElementById("out-logo-wrap");
+    const img = document.getElementById("out-logo");
+    return { visible: !wrap.hidden, src: (img.getAttribute("src") || "").slice(0, 26) };
+  });
+  results.push({
+    name: "Logo-Upload & Persistenz",
+    ok: logoInfo.visible && logoInfo.src.startsWith("data:image/svg+xml"),
+    detail: JSON.stringify(logoInfo),
+  });
+
+  // 6) Ungültiges Logo im Import wird verworfen (kein beliebiger URL-Inhalt)
+  const badLogo = await page.evaluate(() => {
+    setAppStateForTest({ ...getAppState(), logo: { src: "javascript:alert(1)", height: 40 } });
+    return getAppState().logo;
+  });
+  results.push({
+    name: "Logo-Validierung",
+    ok: badLogo === null,
+    detail: `logo=${JSON.stringify(badLogo)}`,
+  });
+
+  // 7) Abschnitt hinzufügen, löschen und rückgängig machen
+  const sectionFlow = await page.evaluate(() => {
+    const before = getAppState().sections.length;
+    addSection();
+    const added = getAppState().sections.length;
+    deleteSection(added - 1);
+    const deleted = getAppState().sections.length;
+    undoLastAction();
+    const restored = getAppState().sections.length;
+    return { before, added, deleted, restored };
+  });
+  results.push({
+    name: "Abschnitte + Rückgängig",
+    ok:
+      sectionFlow.added === sectionFlow.before + 1 &&
+      sectionFlow.deleted === sectionFlow.before &&
+      sectionFlow.restored === sectionFlow.added,
+    detail: JSON.stringify(sectionFlow),
+  });
+
+  // 8) Farbschema wird gespeichert und angewendet
+  await page.evaluate(() => {
+    setTheme("petrol");
+    persistState();
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForTimeout(300);
+  const brand = await page.evaluate(() =>
+    document.getElementById("a4-sheet").style.getPropertyValue("--brand")
+  );
+  results.push({
+    name: "Farbschema-Persistenz",
+    ok: brand.trim() === "#134e4a",
+    detail: `--brand=${brand}`,
+  });
+
+  results.push({
+    name: "keine Console-Errors (gesamt)",
+    ok: errors.length === 0,
+    detail: errors.slice(0, 5).join(" | ") || "ok",
   });
 
   await browser.close();

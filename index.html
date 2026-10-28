@@ -22,182 +22,253 @@
   <link rel="stylesheet" href="assets/css/fontawesome.min.css">
   <link rel="stylesheet" href="assets/css/app.css">
 </head>
-<body class="bg-slate-900 text-slate-100 h-screen flex flex-col overflow-hidden select-none">
+<body class="bg-slate-900 text-slate-100 h-screen flex flex-col overflow-hidden select-none" data-view="editor">
 
   <a class="skip-link no-print" href="#preview-wrapper">Zur Druckvorschau springen</a>
 
   <!-- TOP NAVIGATION & QUICK BAR (NO PRINT) -->
-  <header class="no-print bg-slate-800 border-b border-slate-700 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0 z-20 shadow-md" role="banner">
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-inner" aria-hidden="true">
-        <i class="fa-solid fa-clipboard-check text-lg"></i>
+  <header class="no-print app-header px-3 sm:px-4 py-2.5 flex items-center justify-between gap-3 shrink-0 z-20" role="banner">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-blue-900/40 ring-1 ring-white/10 shrink-0" aria-hidden="true">
+        <i class="fa-solid fa-clipboard-check text-base"></i>
       </div>
-      <div>
-        <h1 class="font-bold text-sm sm:text-base tracking-tight text-white leading-tight">Reinigungs- &amp; Wartungsliste <span class="text-xs font-normal bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded ml-1">DIN A4 Generator</span></h1>
-        <p class="text-xs text-slate-400 hidden sm:block">Echtzeit-Editor &amp; druckfertige 1-Seiten-PDF-Vorschau</p>
+      <div class="min-w-0">
+        <h1 class="font-semibold text-sm sm:text-base tracking-tight text-white leading-tight truncate">Wartungsliste <span class="hidden md:inline text-[11px] font-medium bg-blue-500/15 text-blue-300 ring-1 ring-inset ring-blue-400/25 px-2 py-0.5 rounded-full ml-1.5 align-middle">DIN A4</span></h1>
+        <p class="text-[11px] text-slate-400 hidden sm:block truncate">Bearbeiten, prüfen, drucken – alles auf einer Seite</p>
       </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-2" role="toolbar" aria-label="Schnellaktionen">
-      <button type="button" onclick="loadStandardPreset()" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-medium border border-slate-600 transition flex items-center gap-1.5 shadow-sm" title="Alle Standard-Stationen und Aufgaben wiederherstellen">
+    <div class="flex items-center gap-1.5 sm:gap-2" role="toolbar" aria-label="Schnellaktionen">
+      <button type="button" onclick="loadStandardPreset()" class="btn-ghost" title="Alle Standard-Stationen und Aufgaben wiederherstellen" aria-label="Standard-Daten laden">
         <i class="fa-solid fa-rotate-left text-blue-400" aria-hidden="true"></i>
-        <span>Standard-Daten</span>
+        <span class="hidden xl:inline">Standard-Daten</span>
       </button>
 
-      <button type="button" onclick="loadBlankoPreset()" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-medium border border-slate-600 transition flex items-center gap-1.5 shadow-sm" title="Leere Zeilen für handschriftliches Ausfüllen erzeugen">
+      <button type="button" onclick="loadBlankoPreset()" class="btn-ghost" title="Leere Zeilen für handschriftliches Ausfüllen erzeugen" aria-label="Blanko-Liste erzeugen">
         <i class="fa-regular fa-file text-amber-400" aria-hidden="true"></i>
-        <span>Blanko (Leer)</span>
+        <span class="hidden xl:inline">Blanko (Leer)</span>
       </button>
 
-      <button type="button" onclick="toggleAllCheckboxes()" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-medium border border-slate-600 transition flex items-center gap-1.5 shadow-sm" title="Alle Aufgaben als erledigt oder offen markieren">
+      <button type="button" onclick="toggleAllCheckboxes()" class="btn-ghost" title="Alle Aufgaben als erledigt oder offen markieren" aria-label="Alle Aufgaben umschalten">
         <i class="fa-solid fa-check-double text-emerald-400" aria-hidden="true"></i>
-        <span id="toggle-all-label">Alle erledigt</span>
+        <span id="toggle-all-label" class="hidden xl:inline">Alle erledigt</span>
       </button>
 
-      <div class="h-5 w-px bg-slate-700 mx-1 hidden sm:block"></div>
+      <div class="h-6 w-px bg-slate-700 mx-0.5 hidden sm:block" aria-hidden="true"></div>
 
-      <button type="button" onclick="triggerPrint()" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs sm:text-sm font-semibold transition flex items-center gap-2 shadow-lg shadow-blue-600/30 cursor-pointer">
+      <button type="button" onclick="triggerPrint()" class="btn-primary" aria-label="Drucken oder als PDF speichern">
         <i class="fa-solid fa-print" aria-hidden="true"></i>
-        <span>Drucken / Als PDF speichern</span>
+        <span class="hidden sm:inline">Drucken / PDF</span>
       </button>
     </div>
   </header>
 
+  <!-- Mobile: Umschalter zwischen Editor und Vorschau -->
+  <nav class="no-print lg:hidden px-3 py-2 bg-slate-900 border-b border-slate-800 shrink-0" aria-label="Ansicht">
+    <div class="segmented" role="tablist">
+      <button type="button" id="view-btn-editor" role="tab" aria-selected="true" onclick="setMobileView('editor')"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Bearbeiten</button>
+      <button type="button" id="view-btn-preview" role="tab" aria-selected="false" onclick="setMobileView('preview')"><i class="fa-regular fa-file-lines" aria-hidden="true"></i> Vorschau</button>
+    </div>
+  </nav>
+
   <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
 
-    <aside class="no-print w-full lg:w-[480px] xl:w-[540px] bg-slate-800/90 border-r border-slate-700 flex flex-col h-1/2 lg:h-full shrink-0" aria-label="Editor">
+    <aside id="editor-pane" class="no-print w-full lg:w-[480px] xl:w-[540px] bg-slate-900 lg:border-r border-slate-800 flex flex-col flex-1 lg:flex-none min-h-0 lg:h-full shrink-0" aria-label="Editor">
 
-      <div class="flex border-b border-slate-700 bg-slate-800/60 px-2 pt-2 gap-1 shrink-0 text-xs font-semibold" role="tablist" aria-label="Editor-Bereiche">
-        <button type="button" onclick="switchTab('tab-tasks')" id="btn-tab-tasks" role="tab" aria-selected="true" aria-controls="tab-tasks" tabindex="0" class="px-3.5 py-2 rounded-t-lg bg-slate-900 text-blue-400 border-t border-x border-slate-700 flex items-center gap-1.5">
-          <i class="fa-solid fa-list-check" aria-hidden="true"></i> 1. Aufgaben &amp; Tabellen
+      <div class="editor-tabs shrink-0" role="tablist" aria-label="Editor-Bereiche">
+        <button type="button" onclick="switchTab('tab-tasks')" id="btn-tab-tasks" role="tab" aria-selected="true" aria-controls="tab-tasks" tabindex="0" class="editor-tab">
+          <i class="fa-solid fa-list-check" aria-hidden="true"></i> <span>Aufgaben</span>
         </button>
-        <button type="button" onclick="switchTab('tab-meta')" id="btn-tab-meta" role="tab" aria-selected="false" aria-controls="tab-meta" tabindex="-1" class="px-3.5 py-2 rounded-t-lg text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
-          <i class="fa-solid fa-heading" aria-hidden="true"></i> 2. Kopf- &amp; Fußzeile
+        <button type="button" onclick="switchTab('tab-meta')" id="btn-tab-meta" role="tab" aria-selected="false" aria-controls="tab-meta" tabindex="-1" class="editor-tab">
+          <i class="fa-solid fa-heading" aria-hidden="true"></i> <span>Kopf<span class="hidden sm:inline">- &amp; Fußzeile</span><span class="sm:hidden"> &amp; Logo</span></span>
         </button>
-        <button type="button" onclick="switchTab('tab-style')" id="btn-tab-style" role="tab" aria-selected="false" aria-controls="tab-style" tabindex="-1" class="px-3.5 py-2 rounded-t-lg text-slate-400 hover:text-slate-200 flex items-center gap-1.5">
-          <i class="fa-solid fa-sliders" aria-hidden="true"></i> 3. Optik &amp; Druck-Fit
+        <button type="button" onclick="switchTab('tab-style')" id="btn-tab-style" role="tab" aria-selected="false" aria-controls="tab-style" tabindex="-1" class="editor-tab">
+          <i class="fa-solid fa-palette" aria-hidden="true"></i> <span>Optik<span class="hidden sm:inline"> &amp; Druck</span></span>
         </button>
       </div>
 
-      <div class="flex-1 overflow-y-auto p-4 space-y-5 select-text">
+      <div id="editor-scroll" class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 select-text">
 
-        <div id="quick-meta-bar" class="bg-slate-900/90 border border-slate-700/80 rounded-xl p-3.5 space-y-3 shadow-inner">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <i class="fa-regular fa-calendar-check text-blue-400" aria-hidden="true"></i> Tagesdaten (Kopfzeile)
+        <div id="quick-meta-bar" class="card p-3.5 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <span class="card-title text-slate-300">
+              <i class="fa-regular fa-calendar-check text-blue-400" aria-hidden="true"></i> Tagesdaten
             </span>
-            <button type="button" onclick="clearHeaderFields()" class="text-[11px] text-amber-400 hover:underline flex items-center gap-1" title="Leert Datum &amp; Schicht für eine Schreiblinie auf dem Ausdruck">
-              <i class="fa-solid fa-eraser" aria-hidden="true"></i> Als Blanko-Linie
+            <button type="button" onclick="clearHeaderFields()" class="link-btn text-amber-400" title="Leert Datum &amp; Schicht für eine Schreiblinie auf dem Ausdruck">
+              <i class="fa-solid fa-eraser" aria-hidden="true"></i> Als Schreiblinie
             </button>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label for="inp-datum" class="block text-[11px] font-medium text-slate-300 mb-1">Datum (leer = Schreiblinie)</label>
+              <label for="inp-datum" class="field-label">Datum <span class="text-slate-500">(leer = Linie)</span></label>
               <div class="flex gap-1.5">
-                <input type="text" id="inp-datum" oninput="updateMetaFromInputs()" placeholder="z.B. 28.10.2026" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500" autocomplete="off">
-                <button type="button" onclick="setTodayDate()" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs border border-slate-600 shrink-0" title="Heutiges Datum eintragen">
-                  Heute
-                </button>
+                <input type="text" id="inp-datum" oninput="updateMetaFromInputs()" placeholder="z.B. 28.10.2026" class="field" autocomplete="off" inputmode="numeric">
+                <button type="button" onclick="setTodayDate()" class="btn-ghost shrink-0" title="Heutiges Datum eintragen">Heute</button>
               </div>
             </div>
             <div>
-              <label for="inp-schicht" class="block text-[11px] font-medium text-slate-300 mb-1">Schicht / Bereich (leer = Linie)</label>
-              <input type="text" id="inp-schicht" oninput="updateMetaFromInputs()" placeholder="z.B. Produktion / Lackierung" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500" autocomplete="off">
+              <label for="inp-schicht" class="field-label">Schicht / Bereich <span class="text-slate-500">(leer = Linie)</span></label>
+              <input type="text" id="inp-schicht" oninput="updateMetaFromInputs()" placeholder="z.B. Produktion / Lackierung" class="field" autocomplete="off">
             </div>
           </div>
         </div>
 
-        <div id="tab-tasks" class="space-y-5" role="tabpanel" aria-labelledby="btn-tab-tasks">
-          <div id="sections-editor-container" class="space-y-5">
+        <div id="tab-tasks" class="space-y-4" role="tabpanel" aria-labelledby="btn-tab-tasks">
+          <div id="sections-editor-container" class="space-y-4">
           </div>
+          <button type="button" onclick="addSection()" class="btn-dashed w-full">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i> Abschnitt hinzufügen
+          </button>
         </div>
 
         <div id="tab-meta" class="space-y-4 hidden" role="tabpanel" aria-labelledby="btn-tab-meta" hidden>
-          <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-              <i class="fa-solid fa-database" aria-hidden="true"></i> Daten speichern &amp; austauschen
-            </h3>
-            <p class="text-[11px] text-slate-400">Der Zustand wird automatisch im Browser (localStorage) gesichert. Zusätzlich kannst du eine JSON-Datei exportieren oder importieren.</p>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" onclick="exportStateJson()" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-medium border border-slate-600 transition flex items-center gap-1.5">
-                <i class="fa-solid fa-file-export text-sky-400" aria-hidden="true"></i> JSON exportieren
+
+          <div class="card p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="card-title text-amber-300">
+                <i class="fa-solid fa-image" aria-hidden="true"></i> Firmenlogo
+              </h3>
+              <button type="button" id="btn-logo-remove" onclick="removeLogo()" class="link-btn text-slate-400 hover:text-red-400" hidden>
+                <i class="fa-solid fa-trash-can" aria-hidden="true"></i> Entfernen
               </button>
-              <label class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 text-xs font-medium border border-slate-600 transition flex items-center gap-1.5 cursor-pointer">
-                <i class="fa-solid fa-file-import text-violet-400" aria-hidden="true"></i> JSON importieren
-                <input type="file" id="inp-import-json" accept="application/json,.json" class="sr-only" aria-label="JSON-Datei zum Import wählen">
-              </label>
             </div>
-          </div>
-          <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
-              <i class="fa-solid fa-window-maximize" aria-hidden="true"></i> Header-Banner Texte
-            </h3>
-            <div>
-              <label for="inp-main-title" class="block text-xs text-slate-300 mb-1">Haupttitel</label>
-              <input type="text" id="inp-main-title" oninput="updateMetaFromInputs()" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-              <label for="inp-sub-title" class="block text-xs text-slate-300 mb-1">Untertitel</label>
-              <input type="text" id="inp-sub-title" oninput="updateMetaFromInputs()" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+
+            <label id="logo-drop" for="inp-logo" class="logo-drop">
+              <img id="logo-thumb" alt="" hidden>
+              <span id="logo-drop-empty" class="flex flex-col items-center gap-1.5 text-center">
+                <i class="fa-solid fa-cloud-arrow-up text-xl text-slate-400" aria-hidden="true"></i>
+                <span class="text-xs font-medium text-slate-200">Logo auswählen oder hierher ziehen</span>
+                <span class="text-[11px] text-slate-500">PNG, JPG, SVG oder WebP · erscheint oben im Kopfbereich</span>
+              </span>
+              <input type="file" id="inp-logo" accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif" class="sr-only">
+            </label>
+
+            <div id="logo-options" class="space-y-3" hidden>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <label for="slider-logo-size" class="text-slate-300">Logo-Höhe</label>
+                  <span id="val-logo-size" class="text-blue-400 font-mono">40px</span>
+                </div>
+                <input type="range" id="slider-logo-size" min="20" max="70" step="1" value="40" oninput="updateLogoOptions()" class="range">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <span class="field-label">Position</span>
+                  <div class="segmented segmented-sm" role="radiogroup" aria-label="Logo-Position">
+                    <button type="button" id="logo-pos-left" role="radio" aria-checked="true" onclick="setLogoPosition('left')">Links</button>
+                    <button type="button" id="logo-pos-right" role="radio" aria-checked="false" onclick="setLogoPosition('right')">Rechts</button>
+                  </div>
+                </div>
+                <label class="toggle-row" for="chk-logo-plate">
+                  <span>
+                    <span class="block text-xs text-slate-200">Weißer Hintergrund</span>
+                    <span class="block text-[11px] text-slate-500">für dunkle Logos</span>
+                  </span>
+                  <input type="checkbox" id="chk-logo-plate" onchange="updateLogoOptions()" class="switch" checked>
+                </label>
+              </div>
             </div>
           </div>
 
-          <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+          <div class="card p-4 space-y-3">
+            <h3 class="card-title text-blue-400">
+              <i class="fa-solid fa-window-maximize" aria-hidden="true"></i> Kopfbereich
+            </h3>
+            <div>
+              <label for="inp-main-title" class="field-label">Haupttitel</label>
+              <input type="text" id="inp-main-title" oninput="updateMetaFromInputs()" class="field">
+            </div>
+            <div>
+              <label for="inp-sub-title" class="field-label">Untertitel</label>
+              <input type="text" id="inp-sub-title" oninput="updateMetaFromInputs()" class="field">
+            </div>
+          </div>
+
+          <div class="card p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="card-title text-emerald-400">
                 <i class="fa-solid fa-signature" aria-hidden="true"></i> Unterschriften &amp; Fußzeile
               </h3>
-              <button type="button" onclick="clearSignatures()" class="text-[11px] text-slate-400 hover:text-white">Namen leeren</button>
+              <button type="button" onclick="clearSignatures()" class="link-btn text-slate-400 hover:text-white">Namen leeren</button>
             </div>
-            <p class="text-[11px] text-slate-400">Wenn du hier Namen einträgst, erscheinen sie direkt über der Unterschriftslinie. Lässt du das Feld leer, bleibt Platz für die händische Unterschrift.</p>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Eingetragene Namen erscheinen über der Unterschriftslinie. Leer lassen = Platz für die händische Unterschrift.</p>
             <div>
-              <label for="inp-sig-left" class="block text-xs text-slate-300 mb-1">Ausgeführt von (Name über der Linie)</label>
-              <input type="text" id="inp-sig-left" oninput="updateMetaFromInputs()" placeholder="Leer lassen für Handunterschrift..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+              <label for="inp-sig-left" class="field-label">Ausgeführt von</label>
+              <input type="text" id="inp-sig-left" oninput="updateMetaFromInputs()" placeholder="Leer lassen für Handunterschrift" class="field">
             </div>
             <div>
-              <label for="inp-sig-right" class="block text-xs text-slate-300 mb-1">Kontrolliert von / Schichtleiter (Name über der Linie)</label>
-              <input type="text" id="inp-sig-right" oninput="updateMetaFromInputs()" placeholder="Leer lassen für Handunterschrift..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500">
+              <label for="inp-sig-right" class="field-label">Kontrolliert von / Schichtleiter</label>
+              <input type="text" id="inp-sig-right" oninput="updateMetaFromInputs()" placeholder="Leer lassen für Handunterschrift" class="field">
             </div>
-            <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+            <div class="grid grid-cols-2 gap-2 pt-3 border-t border-slate-800">
               <div>
-                <label for="inp-sig-label-left" class="block text-[11px] text-slate-400 mb-1">Label Links</label>
-                <input type="text" id="inp-sig-label-left" oninput="updateMetaFromInputs()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-200">
+                <label for="inp-sig-label-left" class="field-label">Beschriftung links</label>
+                <input type="text" id="inp-sig-label-left" oninput="updateMetaFromInputs()" class="field field-sm">
               </div>
               <div>
-                <label for="inp-sig-label-right" class="block text-[11px] text-slate-400 mb-1">Label Rechts</label>
-                <input type="text" id="inp-sig-label-right" oninput="updateMetaFromInputs()" class="w-full bg-slate-800 border border-slate-700 rounded px-2 py-1 text-[11px] text-slate-200">
+                <label for="inp-sig-label-right" class="field-label">Beschriftung rechts</label>
+                <input type="text" id="inp-sig-label-right" oninput="updateMetaFromInputs()" class="field field-sm">
               </div>
+            </div>
+            <div>
+              <label for="inp-footer-text" class="field-label">Fußzeile (z.B. Firmenname, Dokument-Nr.)</label>
+              <input type="text" id="inp-footer-text" oninput="updateMetaFromInputs()" placeholder="Reinigungs- und Wartungsliste" class="field field-sm">
+            </div>
+          </div>
+
+          <div class="card p-4 space-y-3">
+            <h3 class="card-title text-sky-400">
+              <i class="fa-solid fa-database" aria-hidden="true"></i> Sichern &amp; austauschen
+            </h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Alles wird automatisch in diesem Browser gespeichert. Als Datei sichern, um die Liste auf ein anderes Gerät mitzunehmen (inkl. Logo).</p>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" onclick="exportStateJson()" class="btn-ghost">
+                <i class="fa-solid fa-file-export text-sky-400" aria-hidden="true"></i> Als Datei sichern
+              </button>
+              <label class="btn-ghost cursor-pointer">
+                <i class="fa-solid fa-file-import text-violet-400" aria-hidden="true"></i> Datei laden
+                <input type="file" id="inp-import-json" accept="application/json,.json" class="sr-only" aria-label="JSON-Datei zum Import wählen">
+              </label>
             </div>
           </div>
         </div>
 
         <div id="tab-style" class="space-y-4 hidden" role="tabpanel" aria-labelledby="btn-tab-style" hidden>
-          <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Seiten-Anpassung (1-Seiten-Garantie)
+
+          <div class="card p-4 space-y-3">
+            <h3 class="card-title text-pink-300">
+              <i class="fa-solid fa-palette" aria-hidden="true"></i> Farbschema
+            </h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Passe die Farben an dein Firmenlogo an. „Tonersparend“ druckt ohne farbige Flächen.</p>
+            <div id="theme-swatches" class="grid grid-cols-4 sm:grid-cols-7 gap-2" role="radiogroup" aria-label="Farbschema"></div>
+          </div>
+
+          <div class="card p-4 space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="card-title text-purple-400">
+                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> Seiten-Anpassung
               </h3>
-              <button type="button" onclick="resetStyleSliders()" class="text-[11px] text-blue-400 hover:underline">Standardwerte</button>
+              <button type="button" onclick="resetStyleSliders()" class="link-btn text-blue-400">Standardwerte</button>
             </div>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Passe Zeilenhöhe, Abstände und Schriftgröße stufenlos an, damit deine Liste unabhängig von der Zeilenanzahl immer perfekt auf exakt eine DIN-A4-Seite passt.
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Zeilenhöhe, Abstände und Schrift stufenlos anpassen, damit die Liste immer auf genau eine DIN-A4-Seite passt.
             </p>
 
             <div>
               <div class="flex justify-between text-xs mb-1">
-                <label for="slider-row-pad" class="text-slate-300">Zeilen-Innenabstand (Padding)</label>
+                <label for="slider-row-pad" class="text-slate-300">Zeilen-Innenabstand</label>
                 <span id="val-row-pad" class="text-blue-400 font-mono">4px</span>
               </div>
-              <input type="range" id="slider-row-pad" min="1.5" max="10" step="0.5" value="4" oninput="updateStyleVariables()" class="w-full accent-blue-500 cursor-pointer" aria-valuetext="4 Pixel">
+              <input type="range" id="slider-row-pad" min="1.5" max="10" step="0.5" value="4" oninput="updateStyleVariables()" class="range">
             </div>
 
             <div>
               <div class="flex justify-between text-xs mb-1">
-                <label for="slider-row-minh" class="text-slate-300">Mindesthöhe pro Zeile (ideal für Blanko-Listen)</label>
+                <label for="slider-row-minh" class="text-slate-300">Mindesthöhe pro Zeile <span class="text-slate-500">(gut für Blanko)</span></label>
                 <span id="val-row-minh" class="text-blue-400 font-mono">26px</span>
               </div>
-              <input type="range" id="slider-row-minh" min="18" max="48" step="1" value="26" oninput="updateStyleVariables()" class="w-full accent-blue-500 cursor-pointer">
+              <input type="range" id="slider-row-minh" min="18" max="48" step="1" value="26" oninput="updateStyleVariables()" class="range">
             </div>
 
             <div>
@@ -205,66 +276,68 @@
                 <label for="slider-font-size" class="text-slate-300">Schriftgröße Tabellen</label>
                 <span id="val-font-size" class="text-blue-400 font-mono">8.5pt</span>
               </div>
-              <input type="range" id="slider-font-size" min="7" max="10.5" step="0.25" value="8.5" oninput="updateStyleVariables()" class="w-full accent-blue-500 cursor-pointer">
+              <input type="range" id="slider-font-size" min="7" max="10.5" step="0.25" value="8.5" oninput="updateStyleVariables()" class="range">
             </div>
 
             <div>
               <div class="flex justify-between text-xs mb-1">
-                <label for="slider-check-size" class="text-slate-300">Checkbox-Größe („Erledigt“)</label>
+                <label for="slider-check-size" class="text-slate-300">Größe Kästchen „Erledigt“</label>
                 <span id="val-check-size" class="text-blue-400 font-mono">12.5pt</span>
               </div>
-              <input type="range" id="slider-check-size" min="9" max="16" step="0.5" value="12.5" oninput="updateStyleVariables()" class="w-full accent-blue-500 cursor-pointer">
+              <input type="range" id="slider-check-size" min="9" max="16" step="0.5" value="12.5" oninput="updateStyleVariables()" class="range">
             </div>
 
             <div>
               <div class="flex justify-between text-xs mb-1">
-                <label for="slider-sec-gap" class="text-slate-300">Abstand zwischen Sektionen</label>
+                <label for="slider-sec-gap" class="text-slate-300">Abstand zwischen Abschnitten</label>
                 <span id="val-sec-gap" class="text-blue-400 font-mono">9px</span>
               </div>
-              <input type="range" id="slider-sec-gap" min="4" max="18" step="1" value="9" oninput="updateStyleVariables()" class="w-full accent-blue-500 cursor-pointer">
+              <input type="range" id="slider-sec-gap" min="4" max="18" step="1" value="9" oninput="updateStyleVariables()" class="range">
             </div>
           </div>
         </div>
 
       </div>
 
-      <div class="px-4 py-2.5 bg-slate-900 border-t border-slate-700 flex items-center justify-between text-xs shrink-0">
+      <div class="px-4 py-2.5 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between gap-3 text-xs shrink-0">
         <div id="page-fit-status" class="flex items-center gap-2 text-emerald-400 font-medium" role="status" aria-live="polite">
           <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-          <span>Sitzt perfekt auf 1 DIN-A4-Seite</span>
+          <span>Passt auf 1 DIN-A4-Seite</span>
         </div>
-        <button type="button" onclick="autoFitPage()" class="text-xs text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1" title="Passt Abstände automatisch optimal an die Seite an">
+        <button type="button" onclick="autoFitPage()" class="link-btn text-blue-400 hover:text-blue-300 font-medium" title="Passt Abstände automatisch optimal an die Seite an">
           <i class="fa-solid fa-compress" aria-hidden="true"></i> Auto-Fit
         </button>
       </div>
     </aside>
 
-    <main id="preview-wrapper" class="flex-1 bg-slate-950/90 flex flex-col items-center justify-start overflow-auto p-4 sm:p-6 relative" aria-label="DIN-A4-Druckvorschau">
+    <main id="preview-wrapper" class="flex-1 preview-bg flex flex-col items-center justify-start overflow-auto p-4 sm:p-6 relative" aria-label="DIN-A4-Druckvorschau">
 
-      <div class="no-print mb-3 flex items-center gap-3 bg-slate-800/90 backdrop-blur border border-slate-700 px-3.5 py-1.5 rounded-full shadow-lg text-xs text-slate-300 shrink-0">
-        <span class="flex items-center gap-1.5 text-slate-400">
+      <div class="no-print mb-4 flex items-center gap-3 bg-slate-800/80 backdrop-blur border border-slate-700/80 pl-3.5 pr-2 py-1.5 rounded-full shadow-lg text-xs text-slate-300 shrink-0 max-w-full">
+        <span class="hidden sm:flex items-center gap-1.5 text-slate-400 min-w-0">
           <i class="fa-solid fa-hand-pointer text-blue-400" aria-hidden="true"></i>
-          <span>Tipp: Klicke in der Vorschau direkt auf <strong class="text-white">☐</strong> zum Abhaken!</span>
+          <span class="truncate">Kästchen in der Vorschau anklicken zum Abhaken</span>
         </span>
-        <div class="h-3.5 w-px bg-slate-700" aria-hidden="true"></div>
-        <div class="flex items-center gap-1.5" role="group" aria-label="Zoom">
-          <button type="button" onclick="adjustZoom(-0.1)" class="w-6 h-6 rounded hover:bg-slate-700 flex items-center justify-center text-slate-300" title="Verkleinern" aria-label="Verkleinern">
+        <div class="hidden sm:block h-3.5 w-px bg-slate-700" aria-hidden="true"></div>
+        <div class="flex items-center gap-1" role="group" aria-label="Zoom">
+          <button type="button" onclick="adjustZoom(-0.1)" class="icon-btn" title="Verkleinern" aria-label="Verkleinern">
             <i class="fa-solid fa-minus text-[10px]" aria-hidden="true"></i>
           </button>
           <span id="zoom-label" class="font-mono text-[11px] w-11 text-center text-slate-200">Auto</span>
-          <button type="button" onclick="adjustZoom(0.1)" class="w-6 h-6 rounded hover:bg-slate-700 flex items-center justify-center text-slate-300" title="Vergrößern" aria-label="Vergrößern">
+          <button type="button" onclick="adjustZoom(0.1)" class="icon-btn" title="Vergrößern" aria-label="Vergrößern">
             <i class="fa-solid fa-plus text-[10px]" aria-hidden="true"></i>
           </button>
-          <button type="button" onclick="resetZoom()" class="text-[11px] text-blue-400 hover:underline ml-1">Fit</button>
+          <button type="button" onclick="resetZoom()" class="px-2 h-7 rounded-full text-[11px] font-medium text-blue-400 hover:bg-slate-700">Einpassen</button>
         </div>
       </div>
-
       <div id="a4-scale-container" class="flex justify-center items-start origin-top transition-transform duration-75">
 
         <section id="a4-sheet" class="a4-page select-text" aria-label="DIN-A4-Seite">
           <div id="a4-inner-content" class="a4-content">
 
-            <header class="pdf-header-banner">
+            <header id="out-banner" class="pdf-header-banner">
+              <div id="out-logo-wrap" class="pdf-logo" hidden>
+                <img id="out-logo" alt="Firmenlogo">
+              </div>
               <div class="pdf-header-title">
                 <h1 id="out-main-title">REINIGUNGS- UND WARTUNGSLISTE</h1>
                 <p id="out-sub-title">Täglicher / Periodischer Arbeitsplan</p>
@@ -302,7 +375,7 @@
           </div>
 
           <footer class="pdf-footer">
-            <span>Reinigungs- und Wartungsliste</span>
+            <span id="out-footer-text">Reinigungs- und Wartungsliste</span>
             <span>Seite 1 von 1</span>
           </footer>
         </section>
@@ -312,7 +385,10 @@
 
   </div>
 
-  <div id="app-toast" class="no-print" role="status" aria-live="polite"></div>
+  <div id="app-toast" class="no-print" role="status" aria-live="polite">
+    <span id="app-toast-msg"></span>
+    <button type="button" id="app-toast-action" hidden></button>
+  </div>
 
   <script src="assets/js/app.js" defer></script>
   <script>
