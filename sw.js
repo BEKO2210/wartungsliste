@@ -1,13 +1,15 @@
-/* Minimal offline cache for GitHub Pages (relative scope). */
-const CACHE = "wartungsliste-v2";
+/* Offline-Cache für GitHub Pages (relativer Scope).
+ * Strategie: Netzwerk zuerst, Cache nur als Fallback ohne Verbindung.
+ * So passen HTML, CSS und JS nach einem Update immer zusammen. */
+const CACHE = "wartungsliste-v3";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./assets/css/tailwind.css",
-  "./assets/css/app.css",
+  "./assets/css/tailwind.css?v=3",
+  "./assets/css/app.css?v=3",
   "./assets/css/fontawesome.min.css",
-  "./assets/js/app.js",
+  "./assets/js/app.js?v=3",
   "./assets/icons/favicon.svg",
   "./assets/icons/favicon-32.png",
   "./assets/icons/icon-192.png",
@@ -32,19 +34,16 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-  if (req.method !== "GET") return;
+  if (req.method !== "GET" || new URL(req.url).origin !== self.location.origin) return;
   event.respondWith(
-    caches.match(req).then((cached) => {
-      const fetched = fetch(req)
-        .then((res) => {
-          if (res && res.ok && new URL(req.url).origin === self.location.origin) {
-            const clone = res.clone();
-            caches.open(CACHE).then((cache) => cache.put(req, clone));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || fetched;
-    })
+    fetch(req, { cache: "no-cache" })
+      .then((res) => {
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, clone));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req).then((cached) => cached || caches.match("./index.html")))
   );
 });
