@@ -1,0 +1,17 @@
+{
+  "name": "wartungsliste",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reinigungs- und Wartungsliste – Editor & DIN-A4-Druckvorschau",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/tailwind-input.css -o ./assets/css/tailwind.css --minify",
+    "build": "npm run build:css",
+    "watch:css": "tailwindcss -i ./src/tailwind-input.css -o ./assets/css/tailwind.css --watch",
+    "test": "node scripts/run-tests.mjs"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17",
+    "@fortawesome/fontawesome-free": "6.4.0",
+    "playwright": "^1.49.0"
+  }
+}
